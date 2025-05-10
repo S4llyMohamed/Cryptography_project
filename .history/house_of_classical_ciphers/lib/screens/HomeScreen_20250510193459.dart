@@ -6,6 +6,7 @@ import 'package:house_of_classical_ciphers/screens/beaufortScreen.dart';
 import 'package:house_of_classical_ciphers/screens/columnarScreen.dart';
 import 'package:house_of_classical_ciphers/screens/homophonicScreen.dart';
 
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -21,6 +22,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+   
       appBar: AppBar(
         title: const Text('House of Classical Ciphers'),
         centerTitle: true,

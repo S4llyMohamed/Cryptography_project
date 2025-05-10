@@ -1,4 +1,8 @@
-import 'package:flutter/material.dart';
+
+
+ 
+
+ import 'package:flutter/material.dart';
 import 'package:house_of_classical_ciphers/screens/AlbertiScreen.dart.dart';
 import 'package:house_of_classical_ciphers/screens/BaconianScreen.dart';
 import 'package:house_of_classical_ciphers/screens/atbashScreen.dart';
@@ -21,9 +25,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('House of Classical Ciphers'),
+        title: const Text(
+          'House of Classical Ciphers',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -67,6 +77,8 @@ class HomeScreen extends StatelessWidget {
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
                   textStyle: const TextStyle(fontSize: 18),
                 ),

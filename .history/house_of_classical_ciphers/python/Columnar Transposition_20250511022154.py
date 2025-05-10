@@ -94,13 +94,13 @@ if __name__ == "__main__":
     if mode == "encrypt" and len(sys.argv) == 4:
         plaintext = sys.argv[2].replace(" ", "")
         key = sys.argv[3]
-        result = encrypt(plaintext, key)
+        result = encryptMessage(plaintext, key)
         print(result)
 
     elif mode == "decrypt" and len(sys.argv) == 4:
         ciphertext = sys.argv[2]
         key = sys.argv[3]
-        result = decrypt(ciphertext, key)
+        result = decryptMessage(ciphertext, key)
         print(result)
 
     elif mode == "crack" and len(sys.argv) == 3:
