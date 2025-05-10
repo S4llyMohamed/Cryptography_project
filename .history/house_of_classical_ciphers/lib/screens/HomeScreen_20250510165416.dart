@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:house_of_classical_ciphers/screens/AlbertiScreen.dart.dart';
-import 'package:house_of_classical_ciphers/screens/BaconianScreen.dart';
-import 'package:house_of_classical_ciphers/screens/atbashScreen.dart';
-import 'package:house_of_classical_ciphers/screens/beaufortScreen.dart';
-import 'package:house_of_classical_ciphers/screens/columnarScreen.dart';
-import 'package:house_of_classical_ciphers/screens/homophonicScreen.dart';
 
 
 class HomeScreen extends StatelessWidget {
@@ -39,22 +34,22 @@ class HomeScreen extends StatelessWidget {
 
                   switch (algorithms[index]) {
                     case 'Atbash Cipher':
-                      destinationPage = const AtbashPage();
+                      destinationPage = const A();
                       break;
                     case 'Homophonic Cipher':
-                      destinationPage = const HomophonicPage();
+                      destinationPage = const VigenerePage();
                       break;
                     case 'Columnar Transposition Cipher':
-                      destinationPage = const ColumnarPage();
+                      destinationPage = const PlayfairPage();
                       break;
                     case 'Baconian Cipher':
-                      destinationPage = const BaconianPage();
+                      destinationPage = const AffinePage();
                       break;
                     case 'Alberti Cipher':
-                      destinationPage = const AlbertiPage();
+                      destinationPage = const RailFencePage();
                       break;
                     case 'Beaufort Cipher':
-                      destinationPage = const BeaufortPage();
+                      destinationPage = const MonoalphabeticPage();
                       break;
                     default:
                       destinationPage = const Scaffold(

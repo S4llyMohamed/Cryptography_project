@@ -54,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                       destinationPage = const AlbertiPage();
                       break;
                     case 'Beaufort Cipher':
-                      destinationPage = const BeaufortPage();
+                      destinationPage = const BeaufortPage ();
                       break;
                     default:
                       destinationPage = const Scaffold(

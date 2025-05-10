@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:house_of_classical_ciphers/screens/AlbertiScreen.dart.dart';
-import 'package:house_of_classical_ciphers/screens/BaconianScreen.dart';
-import 'package:house_of_classical_ciphers/screens/atbashScreen.dart';
-import 'package:house_of_classical_ciphers/screens/beaufortScreen.dart';
-import 'package:house_of_classical_ciphers/screens/columnarScreen.dart';
-import 'package:house_of_classical_ciphers/screens/homophonicScreen.dart';
 
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   final List<String> algorithms = const [
-    'Atbash Cipher',
-    'Homophonic Cipher',
-    'Columnar Transposition Cipher',
-    'Baconian Cipher',
-    'Alberti Cipher',
-    'Beaufort Cipher',
+    'Caesar Cipher',
+    'Vigenère Cipher',
+    'Playfair Cipher',
+    'Affine Cipher',
+    'Rail Fence Cipher',
+    'Monoalphabetic Cipher',
   ];
 
   @override
@@ -38,24 +33,24 @@ class HomeScreen extends StatelessWidget {
                   Widget destinationPage;
 
                   switch (algorithms[index]) {
-                    case 'Atbash Cipher':
-                      destinationPage = const AtbashPage();
+                    case 'Caesar Cipher':
+                      destinationPage = const CaesarPage();
                       break;
-                    case 'Homophonic Cipher':
-                      destinationPage = const HomophonicPage();
-                      break;
-                    case 'Columnar Transposition Cipher':
-                      destinationPage = const ColumnarPage();
-                      break;
-                    case 'Baconian Cipher':
-                      destinationPage = const BaconianPage();
-                      break;
-                    case 'Alberti Cipher':
-                      destinationPage = const AlbertiPage();
-                      break;
-                    case 'Beaufort Cipher':
-                      destinationPage = const BeaufortPage();
-                      break;
+                    // case 'Vigenère Cipher':
+                    //   destinationPage = const VigenerePage();
+                    //   break;
+                    // case 'Playfair Cipher':
+                    //   destinationPage = const PlayfairPage();
+                    //   break;
+                    // case 'Affine Cipher':
+                    //   destinationPage = const AffinePage();
+                    //   break;
+                    // case 'Rail Fence Cipher':
+                    //   destinationPage = const RailFencePage();
+                    //   break;
+                    // case 'Monoalphabetic Cipher':
+                    //   destinationPage = const MonoalphabeticPage();
+                    //   break;
                     default:
                       destinationPage = const Scaffold(
                         body: Center(child: Text('Coming Soon')),

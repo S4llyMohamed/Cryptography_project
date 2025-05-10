@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:house_of_classical_ciphers/screens/AlbertiScreen.dart.dart';
 import 'package:house_of_classical_ciphers/screens/BaconianScreen.dart';
 import 'package:house_of_classical_ciphers/screens/atbashScreen.dart';
-import 'package:house_of_classical_ciphers/screens/beaufortScreen.dart';
 import 'package:house_of_classical_ciphers/screens/columnarScreen.dart';
 import 'package:house_of_classical_ciphers/screens/homophonicScreen.dart';
 
