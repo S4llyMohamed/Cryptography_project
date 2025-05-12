@@ -3,7 +3,7 @@ import sys
 external_circle = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"
 internal_circle = "ZYXWVUTSRQPONMLKJIHGFEDCBAÑ"
 
-def encrypt(text, key):
+def encrypt_alberti(text, key):
     cipher = ""
     key_index = external_circle.index(key.upper())
     for char in text:
@@ -14,7 +14,7 @@ def encrypt(text, key):
         cipher += internal_circle[(external_index + key_index) % len(external_circle)]
     return cipher
 
-def decrypt(ciphertext, key):
+def decrypt_alberti(ciphertext, key):
     text = ""
     key_index = external_circle.index(key.upper())
     for char in ciphertext:
@@ -25,23 +25,37 @@ def decrypt(ciphertext, key):
         text += external_circle[(internal_index - key_index) % len(external_circle)]
     return text
 
-def crack(ciphertext, key):
-    decrypted_text = decrypt(ciphertext, key)
-    print(f"Cracked text: {decrypted_text}")
+def crack_alberti(ciphertext, key):
+    return decrypt_alberti(ciphertext, key)
 
-if __name__ == "__main__":
+def main():
     if len(sys.argv) != 4:
-        print("Usage: python script.py <KEY> <TEXT_TO_ENCRYPT> <CIPHERTEXT_TO_CRACK>")
+        print("Usage: python alberti.py <operation> <text> <key>")
         sys.exit(1)
 
-    key = sys.argv[1].upper()
-    text = sys.argv[2].upper()
-    to_crack = sys.argv[3].upper()
+    operation = sys.argv[1].lower()
+    input_text = sys.argv[2].upper()
+    key = sys.argv[3].upper()
 
-    cipher = encrypt(text, key)
-    print(f"Encrypted: {cipher}")
+    if key not in external_circle:
+        print("Invalid key. Please enter a single character from the external alphabet.")
+        sys.exit(1)
 
-    decrypted = decrypt(cipher, key)
-    print(f"Decrypted: {decrypted}")
+    if operation == "encrypt":
+        result = encrypt_alberti(input_text, key)
+        print(result)
 
-    crack(to_crack, key)
+    elif operation == "decrypt":
+        result = decrypt_alberti(input_text, key)
+        print(result)
+
+    elif operation == "crack":
+        result = crack_alberti(input_text, key)
+        print(result)
+
+    else:
+        print("Invalid operation. Choose from: encrypt, decrypt, crack.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

@@ -1,7 +1,6 @@
 import re
 import itertools
 import sys
-from collections import Counter
 
 
 class BeaufortCipher:
@@ -27,89 +26,78 @@ class BeaufortCipher:
         return re.match("^[a-z]+$", key) is not None
 
     def encrypt(self, plaintext: str):
-        plaintext = plaintext.lower()
-        plaintext = re.sub("[^a-z]+", "", plaintext)
+        plaintext = re.sub("[^a-z]+", "", plaintext.lower())
         ciphertext = ""
-
         i = 0
         for letter in plaintext:
             letter_num = ord(letter) - ord('a')
             cipher_letter_num = (self._key_array[i] - letter_num) % self.ALPHABET_SIZE
             ciphertext += chr(cipher_letter_num + ord('a'))
-
             i = (i + 1) % len(self._key)
-
         return ciphertext.upper()
 
     def decrypt(self, ciphertext: str):
-        ciphertext = ciphertext.lower()
-        ciphertext = re.sub("[^a-z]+", "", ciphertext)
+        ciphertext = re.sub("[^a-z]+", "", ciphertext.lower())
         plaintext = ""
-
         i = 0
         for letter in ciphertext:
             letter_num = ord(letter) - ord('a')
             plain_letter_num = (self._key_array[i] - letter_num) % self.ALPHABET_SIZE
             plaintext += chr(plain_letter_num + ord('a'))
-
             i = (i + 1) % len(self._key)
-
         return plaintext
 
     def crack(self, ciphertext: str, key_length: int):
-        ciphertext = ciphertext.lower()
-        ciphertext = re.sub("[^a-z]+", "", ciphertext)
-
-        total_combinations = 26 ** key_length
-
-        if key_length > 3:
-            return []  
-
-        count = 0
+        ciphertext = re.sub("[^a-z]+", "", ciphertext.lower())
         possible_keys = []
-        for combo in itertools.product(sorted(range(self.ALPHABET_SIZE)), repeat=key_length):
+
+        for combo in itertools.product(range(self.ALPHABET_SIZE), repeat=key_length):
             key_candidate = ''.join(chr(num + ord('a')) for num in combo)
             cracker = BeaufortCipher(key_candidate)
             plaintext_candidate = cracker.decrypt(ciphertext)
             possible_keys.append((key_candidate.upper(), plaintext_candidate))
 
-            count += 1
-           
-
-        with open('crack_results.txt', 'w') as f:
-            for guessed_key, cracked_plaintext in possible_keys:
-                f.write(f"Key: {guessed_key} | Text: {cracked_plaintext}\n")
-
         return possible_keys
 
 
 def main():
-    print("--- Beaufort Cipher ---")
+    if len(sys.argv) != 4:
+        print("Usage: python script.py <operation> <text> <key_or_keylength>")
+        sys.exit(1)
 
-    if len(sys.argv) < 3:
-        print("Usage: python script.py <key> <text> [<crack_key_length>]")
-        return
+    operation = sys.argv[1].lower()
+    input_text = sys.argv[2]
+    key_or_len = sys.argv[3]
 
-    key = sys.argv[1]
-    message = sys.argv[2]
+    if operation == "encrypt":
+        cipher = BeaufortCipher(key_or_len)
+        result = cipher.encrypt(input_text)
+        print(result)
 
-    cipher = BeaufortCipher(key)
-    print(f"Key: {cipher.get_key()}")
+    elif operation == "decrypt":
+        cipher = BeaufortCipher(key_or_len)
+        result = cipher.decrypt(input_text)
+        print(result)
 
-    encrypted = cipher.encrypt(message)
-    print(f"Encrypted: {encrypted}")
+    elif operation == "crack":
+        try:
+            key_length = int(key_or_len)
+        except ValueError:
+            print("For crack, the third argument must be an integer key length.")
+            sys.exit(1)
 
-    decrypted = cipher.decrypt(encrypted)
-    print(f"Decrypted: {decrypted}")
+        if key_length > 4:
+            print("Key length too large for brute force.")
+            sys.exit(1)
 
-    if len(sys.argv) >= 4:
-        crack_length = int(sys.argv[3])
-        possible_cracks = cipher.crack(encrypted, crack_length)
+        cipher = BeaufortCipher("a")  # dummy key
+        results = cipher.crack(input_text, key_length)
 
-        if possible_cracks:
-            print("\nCrack Results (written to crack_results.txt):")
-            for guessed_key, cracked_plaintext in possible_cracks:
-                print(f"Key: {guessed_key} | Text: {cracked_plaintext}")
+        for key, text in results:
+            print(f"{key}:{text}")
+    else:
+        print("Invalid operation. Choose from: encrypt, decrypt, crack.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
