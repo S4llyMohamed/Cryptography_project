@@ -23,9 +23,9 @@ def decrypt(text):
     return atbash_cipher(text)
 
 def crack(cipher_text):
-    print("Attempting to crack...")
+  
     possible_plaintext = decrypt(cipher_text)
-    print("Decrypted text (guess):", possible_plaintext)
+   
     return possible_plaintext
 
 if __name__ == "__main__":

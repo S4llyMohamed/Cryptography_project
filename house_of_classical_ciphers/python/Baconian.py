@@ -1,12 +1,12 @@
-import re
 import random
-import sys
+import itertools
+import math
+import re
 import json
+import sys
 
-# Alphabet constant
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-# Utility functions
 def strip_repeats(s):
     return "".join(dict.fromkeys(s))
 
@@ -16,7 +16,7 @@ def answerize(s):
     return ret.upper()
 
 def letter_to_num(x):
-    return (ord(x.upper()) - 65)
+    return ord(x.upper()) - 65
 
 def A0Z25(x):
     return chr((x % 26) + 65)
@@ -42,7 +42,6 @@ def debaconify(s):
     return A0Z25(a)
 
 class Baconian:
-    
     def __init__(self):
         self.zero_set = set('ABCDEFGHIJKLM')
         self.one_set = set('NOPQRSTUVWXYZ')
@@ -64,8 +63,6 @@ class Baconian:
                 binary += '0'
             elif char in self.one_set:
                 binary += '1'
-            else:
-                continue
         plaintext = ''
         for i in range(0, len(binary), 5):
             chunk = binary[i:i+5]
@@ -73,42 +70,72 @@ class Baconian:
                 plaintext += debaconify(chunk)
         return plaintext
 
-# Main program loop for command-line interaction
-if len(sys.argv) < 2:
-    print("Usage: python script.py <operation> [text]")
-    sys.exit(1)
+    def crack(self, ciphertext):
+        results = []
+        max_key_len = len(ciphertext) // 2
+        for key_len in range(2, max_key_len + 1):
+            perms = itertools.permutations(range(key_len))
+            for perm in perms:
+                try:
+                    decrypted = self.decryptMessageWithKeyOrder(ciphertext, perm)
+                    results.append({
+                        "key_length": key_len,
+                        "order": perm,
+                        "decrypted": decrypted
+                    })
+                except Exception:
+                    continue
+        return results
 
-operation = sys.argv[1].strip()
-cipher = Baconian()
+    def decryptMessageWithKeyOrder(self, cipher, key_order):
+        msg = ""
+        msg_len = float(len(cipher))
+        msg_lst = list(cipher)
+        col = len(key_order)
+        row = int(math.ceil(msg_len / col))
+        dec_cipher = []
+        for _ in range(row):
+            dec_cipher += [[None] * col]
+        msg_indx = 0
+        for k in key_order:
+            for r in range(row):
+                if msg_indx < len(msg_lst):
+                    dec_cipher[r][k] = msg_lst[msg_indx]
+                    msg_indx += 1
+        try:
+            msg = ''.join(sum(dec_cipher, []))
+        except TypeError:
+            raise TypeError("Error during cracking.")
+        null_count = msg.count('_')
+        return msg[:-null_count] if null_count > 0 else msg
 
-if operation == '1':  # Encrypt
-    if len(sys.argv) < 4:
-        print("Usage for encryption: python script.py 1 <plaintext>")
+def main():
+   
+    if len(sys.argv) != 4:
+        print("Usage: python script.py <operation> <input_text>")
         sys.exit(1)
-    plaintext = sys.argv[2]
-    encrypted = cipher.encrypt(plaintext)
-    print(json.dumps({"encrypted_ciphertext": encrypted}))
 
-elif operation == '2':  # Decrypt
-    if len(sys.argv) < 4:
-        print("Usage for decryption: python script.py 2 <ciphertext>")
+    operation = sys.argv[1]  
+    input_text = sys.argv[2]  
+
+    baconian = Baconian()
+
+    if operation == "encrypt":
+        result = baconian.encrypt(input_text)
+        print( result)
+
+    elif operation == "decrypt":
+        result = baconian.decrypt(input_text)
+        print( result)
+
+    elif operation == "crack":
+        results = baconian.crack(input_text)
+        print("Possible decrypted texts:")
+        print(json.dumps(results, indent=2))
+
+    else:
+        print("Invalid operation.")
         sys.exit(1)
-    ciphertext = sys.argv[2]
-    decrypted = cipher.decrypt(ciphertext)
-    print(json.dumps({"decrypted_plaintext": decrypted}))
 
-elif operation == '3':  # Crack
-    if len(sys.argv) < 3:
-        print("Usage for cracking: python script.py 3 <ciphertext>")
-        sys.exit(1)
-    ciphertext = sys.argv[2]
-    cracked = cipher.decrypt(ciphertext)  # Assumes classic Baconian encoding
-    print(json.dumps({"cracked_plaintext": cracked}))
-
-elif operation == '4':  # Exit
-    print("Exiting...")
-    sys.exit(0)
-
-else:
-    print("Invalid choice. Please enter 1, 2, 3, or 4.")
-    sys.exit(1)
+if __name__ == "__main__":
+    main()

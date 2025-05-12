@@ -1,7 +1,6 @@
 import re
 import itertools
 import sys
-import json
 from collections import Counter
 
 
@@ -18,6 +17,7 @@ class BeaufortCipher:
 
     def set_key(self, key: str):
         if self.is_key_valid(key.lower()):
+            self._key = key.lower()
             self._key_array = [ord(letter) - ord('a') for letter in self._key]
         else:
             raise Exception("Invalid Key")
@@ -56,91 +56,61 @@ class BeaufortCipher:
 
         return plaintext
 
-    @staticmethod
-    def crack(ciphertext: str):
+    def crack(self, ciphertext: str, key_length: int):
         ciphertext = ciphertext.lower()
         ciphertext = re.sub("[^a-z]+", "", ciphertext)
 
-        probable_lengths = BeaufortCipher.find_probable_key_lengths(ciphertext)
+        total_combinations = 26 ** key_length
 
-        results = []
+        if key_length > 3:
+            return []  
 
-        for key_length in probable_lengths:
-            possible_keys = itertools.product('abcdefghijklmnopqrstuvwxyz', repeat=key_length)
-            for key_tuple in possible_keys:
-                key = ''.join(key_tuple)
-                try:
-                    cipher = BeaufortCipher(key)
-                    plaintext = cipher.decrypt(ciphertext)
-                    if BeaufortCipher.is_plaintext_likely(plaintext):
-                        results.append({
-                            "key": key.upper(),
-                            "decrypted": plaintext
-                        })
-                except Exception:
-                    continue
-        return results
+        count = 0
+        possible_keys = []
+        for combo in itertools.product(sorted(range(self.ALPHABET_SIZE)), repeat=key_length):
+            key_candidate = ''.join(chr(num + ord('a')) for num in combo)
+            cracker = BeaufortCipher(key_candidate)
+            plaintext_candidate = cracker.decrypt(ciphertext)
+            possible_keys.append((key_candidate.upper(), plaintext_candidate))
 
-    @staticmethod
-    def find_probable_key_lengths(ciphertext: str):
-        distances = []
-        for seq_len in range(3, 6):
-            for i in range(len(ciphertext) - seq_len):
-                seq = ciphertext[i:i + seq_len]
-                for j in range(i + seq_len, len(ciphertext) - seq_len):
-                    if ciphertext[j:j + seq_len] == seq:
-                        distances.append(j - i)
+            count += 1
+           
 
-        if not distances:
-            return [1, 2, 3, 4, 5, 6, 7, 8]
+        with open('crack_results.txt', 'w') as f:
+            for guessed_key, cracked_plaintext in possible_keys:
+                f.write(f"Key: {guessed_key} | Text: {cracked_plaintext}\n")
 
-        factor_counts = Counter()
-        for distance in distances:
-            for factor in range(2, 21):
-                if distance % factor == 0:
-                    factor_counts[factor] += 1
-
-        most_common = [item[0] for item in factor_counts.most_common(5)]
-        return most_common if most_common else [1, 2, 3, 4, 5]
-
-    @staticmethod
-    def is_plaintext_likely(text: str):
-        common_words = ["the", "and", "that", "have", "for", "not", "with", "you", "this"]
-        return any(word in text for word in common_words)
+        return possible_keys
 
 
-# Entry point for Flutter integration
+def main():
+    print("--- Beaufort Cipher ---")
+
+    if len(sys.argv) < 3:
+        print("Usage: python script.py <key> <text> [<crack_key_length>]")
+        return
+
+    key = sys.argv[1]
+    message = sys.argv[2]
+
+    cipher = BeaufortCipher(key)
+    print(f"Key: {cipher.get_key()}")
+
+    encrypted = cipher.encrypt(message)
+    print(f"Encrypted: {encrypted}")
+
+    decrypted = cipher.decrypt(encrypted)
+    print(f"Decrypted: {decrypted}")
+
+    if len(sys.argv) >= 4:
+        crack_length = int(sys.argv[3])
+        possible_cracks = cipher.crack(encrypted, crack_length)
+
+        if possible_cracks:
+            print("\nCrack Results (written to crack_results.txt):")
+            for guessed_key, cracked_plaintext in possible_cracks:
+                print(f"Key: {guessed_key} | Text: {cracked_plaintext}")
+
+
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage:\n  encrypt <plaintext> <key>\n  decrypt <ciphertext> <key>\n  crack <ciphertext>")
-        sys.exit(1)
-
-    mode = sys.argv[1]
-
-    if mode == "encrypt" and len(sys.argv) == 4:
-        plaintext = sys.argv[2].replace(" ", "")
-        key = sys.argv[3]
-        try:
-            cipher = BeaufortCipher(key)
-            result = cipher.encrypt(plaintext)
-            print(result)
-        except Exception as e:
-            print(f"Error: {e}")
-
-    elif mode == "decrypt" and len(sys.argv) == 4:
-        ciphertext = sys.argv[2]
-        key = sys.argv[3]
-        try:
-            cipher = BeaufortCipher(key)
-            result = cipher.decrypt(ciphertext)
-            print(result)
-        except Exception as e:
-            print(f"Error: {e}")
-
-    elif mode == "crack" and len(sys.argv) == 3:
-        ciphertext = sys.argv[2]
-        results = BeaufortCipher.crack(ciphertext)
-        print(json.dumps(results, indent=2))
-
-    else:
-        print("Invalid arguments.")
+    main()
